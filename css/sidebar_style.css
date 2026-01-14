@@ -1,0 +1,56 @@
+/* SIDEBAR BACKGROUND */
+.sb-sidenav-dark {
+    background: linear-gradient(180deg, #93acd3, #737f9a);
+}
+
+/* USER CARD */
+.sidebar-user {
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 12px;
+    margin: 0 12px 16px;
+}
+
+/* USER NAME */
+.sidebar-user .name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* USER ROLE */
+.sidebar-user .role {
+    font-size: 12px;
+    color: #cbd5e1;
+}
+
+/* MENU LINK */
+.sb-sidenav .nav-link {
+    border-radius: 8px;
+    margin: 4px 10px;
+    padding: 10px 14px;
+    transition: all 0.3s ease;
+}
+
+/* HOVER */
+.sb-sidenav .nav-link:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateX(4px);
+}
+
+/* ACTIVE MENU */
+.sb-sidenav .nav-link.active {
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* ICON */
+.sb-nav-link-icon {
+    color: #93c5fd;
+}
+
+/* COLLAPSE NESTED */
+.sb-sidenav-menu-nested .nav-link {
+    font-size: 13px;
+    padding-left: 35px;
+}
