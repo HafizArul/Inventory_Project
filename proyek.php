@@ -52,6 +52,7 @@ if (isset($_POST['submit'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -62,6 +63,7 @@ if (isset($_POST['submit'])) {
     <link href="css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
+
 <body class="sb-nav-fixed">
     <!-- Navbar -->
     <?php include 'navbar.php'; ?> <!-- opsional -->
@@ -96,7 +98,7 @@ if (isset($_POST['submit'])) {
                                         <th>Lokasi</th>
                                         <th>Tanggal Mulai</th>
                                         <th>Tanggal Selesai</th>
-                                         <th>Opsi</th>
+                                        <th>Opsi</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
@@ -106,13 +108,13 @@ if (isset($_POST['submit'])) {
                                         <th>Lokasi</th>
                                         <th>Tanggal Mulai</th>
                                         <th>Tanggal Selesai</th>
-                                         <th>Opsi</th>
+                                        <th>Opsi</th>
                                     </tr>
                                 </tfoot>
                                 <tbody>
                                     <?php
                                     if ($result->num_rows > 0) {
-                                        while($row = $result->fetch_assoc()) {
+                                        while ($row = $result->fetch_assoc()) {
                                             echo "<tr>
                                                     <td>{$row['id_proyek']}</td>
                                                     <td>{$row['nama_proyek']}</td>
@@ -152,62 +154,62 @@ if (isset($_POST['submit'])) {
 
     <!-- Form Modal -->
     <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">Input Data Proyek</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Input Data Proyek</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="post">
+                        <div class="mb-3">
+                            <label for="namaProyek" class="form-label">Input Nama Proyek</label>
+                            <input type="text" class="form-control" id="namaProyek" name="nama_proyek" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="jenisProyek" class="form-label">Input Jenis Proyek</label>
+                            <select id="jenisProyek" class="form-select" name="jenisProyek" required>
+                                <option selected>Pilih Jenis Proyek...</option>
+                                <option value="Perumahan">Perumahan</option>
+                                <option value="Gedung">Gedung</option>
+                                <option value="Jalan">Jalan</option>
+                                <option value="Renovasi">Renovasi</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <div class="col-md-12">
+                                <label for="lokasi" class="form-label">Input Lokasi</label>
+                                <input type="text" class="form-control" id="lokasi" name="lokasi" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="col-md-12">
+                                <label for="status" class="form-label">Input Status</label>
+                                <select id="status" class="form-select" name="status" required>
+                                    <option selected>Pilih Status...</option>
+                                    <option value="Perencanaan">Perencanaan</option>
+                                    <option value="Berjalan">Berjalan</option>
+                                    <option value="Selesai">Selesai</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="tanggalMulai" class="form-label">Tanggal Mulai</label>
+                                <input type="date" class="form-control" id="tanggalMulai" name="tanggal_mulai" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="tanggalSelesai" class="form-label">Tanggal Selesai</label>
+                                <input type="date" class="form-control" id="tanggalSelesai" name="tanggal_selesai" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 d-grid mx-auto">
+                            <button type="submit" class="btn btn-primary" name="submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-            <form action="" method="post">
-                <div class="mb-3">
-                    <label for="namaProyek" class="form-label">Input Nama Proyek</label>
-                    <input type="text" class="form-control" id="namaProyek" name="nama_proyek" required>
-                </div>
-                <div class="mb-3">
-                    <label for="jenisProyek" class="form-label">Input Jenis Proyek</label>
-                    <select id="jenisProyek" class="form-select" name="jenisProyek" required>
-                        <option selected>Pilih Jenis Proyek...</option>
-                        <option value="Perumahan">Perumahan</option>
-                        <option value="Gedung">Gedung</option>
-                        <option value="Jalan">Jalan</option>
-                        <option value="Renovasi">Renovasi</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <div class="col-md-12">
-                        <label for="lokasi" class="form-label">Input Lokasi</label>
-                        <input type="text" class="form-control" id="lokasi" name="lokasi" required>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="col-md-12">
-                        <label for="status" class="form-label">Input Status</label>
-                        <select id="status" class="form-select" name="status" required>
-                            <option selected>Pilih Status...</option>
-                            <option value="Perencanaan">Perencanaan</option>
-                            <option value="Berjalan">Berjalan</option>
-                            <option value="Selesai">Selesai</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="tanggalMulai" class="form-label">Tanggal Mulai</label>
-                        <input type="date" class="form-control" id="tanggalMulai" name="tanggal_mulai" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="tanggalSelesai" class="form-label">Tanggal Selesai</label>
-                        <input type="date" class="form-control" id="tanggalSelesai" name="tanggal_selesai" required>
-                    </div>
-                </div>
-                <div class="mb-3 d-grid mx-auto">
-                    <button type="submit" class="btn btn-primary" name="submit">Submit</button>
-                </div>
-            </form>
-        </div>
-        </div>
-    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
@@ -217,4 +219,5 @@ if (isset($_POST['submit'])) {
         const dataTable = new simpleDatatables.DataTable("#datatablesSimple");
     </script>
 </body>
+
 </html>

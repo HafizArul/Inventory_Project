@@ -48,70 +48,79 @@ if (isset($_POST['submit'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Barang Keluar</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet">
-<link href="css/styles.css" rel="stylesheet">
+<head>
+    <meta charset="utf-8">
+    <title>Barang Keluar</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 
 <body class="sb-nav-fixed">
 
-<?php include 'navbar.php'; ?>
+    <?php include 'navbar.php'; ?>
 
-<div id="layoutSidenav">
-    <div id="layoutSidenav_nav">
-        <?php include 'sidebar.php'; ?>
-    </div>
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <?php include 'sidebar.php'; ?>
+        </div>
 
-    <div id="layoutSidenav_content">
-        <main class="container-fluid px-4">
+        <div id="layoutSidenav_content">
+            <main class="container-fluid px-4">
 
-            <h1 class="mt-4">Barang Keluar</h1>
-            <ol class="breadcrumb mb-4">
-                <li class="breadcrumb-item active">Dashboard / Barang Masuk</li>
-            </ol>
-            <button class="btn btn-primary mb-3"
+                <h1 class="mt-4">Barang Keluar</h1>
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item active">Dashboard / Barang Masuk</li>
+                </ol>
+                <button class="btn btn-primary mb-3"
                     data-bs-toggle="modal"
                     data-bs-target="#modalKeluar">
-                <i class="fas fa-plus"></i> Tambah Barang Keluar
-            </button>
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-boxes me-1"></i>
-                    Data Barang Keluar
-                </div>
-                <div class="card-body">
+                    <i class="fas fa-plus"></i> Tambah Barang Keluar
+                </button>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-boxes me-1"></i>
+                        Data Barang Keluar
+                    </div>
+                    <div class="card-body">
 
-                    <table id="datatablesSimple" class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Barang</th>
-                            <th>Proyek</th>
-                            <th>Jumlah</th>
-                            <th>Tanggal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($row = mysqli_fetch_assoc($dataKeluar)) { ?>
-                        <tr>
-                            <td><?= $row['id_keluar'] ?></td>
-                            <td><?= $row['nama_barang'] ?></td>
-                            <td><?= $row['nama_proyek'] ?></td>
-                            <td><?= $row['jumlah'] ?></td>
-                            <td><?= $row['tanggal'] ?></td>
-                        </tr>
-                        <?php } ?>
-                    </tbody>
-                    </table>
+                        <table id="datatablesSimple" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Barang</th>
+                                    <th>Proyek</th>
+                                    <th>Jumlah</th>
+                                    <th>Tanggal</th>
+                                    <th>Opsi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                while ($row = mysqli_fetch_assoc($dataKeluar)) { ?>
+                                    <tr>
+                                        <td><?= $row['id_keluar'] ?></td>
+                                        <td><?= $row['nama_barang'] ?></td>
+                                        <td><?= $row['nama_proyek'] ?></td>
+                                        <td><?= $row['jumlah'] ?></td>
+                                        <td><?= $row['tanggal'] ?></td>
+                                        <td>
+                                            <button class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i></button>
+                                            <button class='btn btn-sm btn-danger'><i class='bi bi-trash'></i></button>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
-</div>
 
     <!-- ================= MODAL ================= -->
     <div class="modal fade" id="modalKeluar" tabindex="-1">
@@ -129,30 +138,30 @@ if (isset($_POST['submit'])) {
                         <div class="mb-3">
                             <label class="form-label">Barang</label>
                             <select name="id_barang" class="form-select" required>
-                            <option value="">Pilih Barang</option>
-                            <?php while ($b = mysqli_fetch_assoc($barang)) { ?>
-                            <option value="<?= $b['id_barang'] ?>"><?= $b['nama_barang'] ?></option>
-                            <?php } ?>
+                                <option value="">Pilih Barang</option>
+                                <?php while ($b = mysqli_fetch_assoc($barang)) { ?>
+                                    <option value="<?= $b['id_barang'] ?>"><?= $b['nama_barang'] ?></option>
+                                <?php } ?>
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Proyek</label>
                             <select name="id_proyek" class="form-select" required>
-                            <option value="">Pilih Proyek</option>
-                            <?php while ($p = mysqli_fetch_assoc($proyek)) { ?>
-                            <option value="<?= $p['id_proyek'] ?>"><?= $p['nama_proyek'] ?></option>
-                            <?php } ?>
+                                <option value="">Pilih Proyek</option>
+                                <?php while ($p = mysqli_fetch_assoc($proyek)) { ?>
+                                    <option value="<?= $p['id_proyek'] ?>"><?= $p['nama_proyek'] ?></option>
+                                <?php } ?>
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Tahap Proyek</label>
                             <select name="id_tahap" class="form-select" required>
-                            <option value="">Pilih Tahap</option>
-                            <?php while ($t = mysqli_fetch_assoc($tahap)) { ?>
-                            <option value="<?= $t['id_tahap'] ?>"><?= $t['nama_tahap'] ?></option>
-                            <?php } ?>
+                                <option value="">Pilih Tahap</option>
+                                <?php while ($t = mysqli_fetch_assoc($tahap)) { ?>
+                                    <option value="<?= $t['id_tahap'] ?>"><?= $t['nama_tahap'] ?></option>
+                                <?php } ?>
                             </select>
                         </div>
 
@@ -167,7 +176,7 @@ if (isset($_POST['submit'])) {
                         </div>
 
                         <button type="submit" name="submit" class="btn btn-primary w-100">
-                        Simpan
+                            Simpan
                         </button>
 
                     </form>
@@ -179,10 +188,12 @@ if (isset($_POST['submit'])) {
 
     <!-- ================= SCRIPT ================= -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/scripts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"></script>
     <script>
-    new simpleDatatables.DataTable("#datatablesSimple");
+        const dataTable = new simpleDatatables.DataTable("#datatablesSimple");
     </script>
 
 </body>
+
 </html>

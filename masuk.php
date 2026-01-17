@@ -89,7 +89,7 @@ if (isset($_POST['submit'])) {
                             Data Barang Masuk
                         </div>
                         <div class="card-body">
-                            <table id="datatablesSimple">
+                            <table id="datatablesSimple" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
                                         <th>ID Masuk</th>
