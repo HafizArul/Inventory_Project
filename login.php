@@ -40,13 +40,14 @@ if (isset($_POST['login'])) {
     <title>Inventory Login</title>
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/login-style.css">
 </head>
-<body class="bg-light"> <!-- Ganti background body -->
+<body class="bg-light" style="background: url('assets/img/Scallops.png') no-repeat; background-size: cover;"> <!-- Ganti background body -->
 
 <div class="container">
-    <div class="row justify-content-center">
+    <div class="row justify-content-center align-items-center vh-100">
         <div class="col-lg-5">
-            <div class="card shadow-lg mt-5" style="border-radius: 15px; border: 2px solid #ffffff;">
+            <div class="card shadow-lg mt-5" style="border-radius: 15px;  overflow: hidden; background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);">
                 <div class="card-header text-center" style="background-color: #e7b45c; color: #ffffff; font-weight: bold;">
                     <h3>Inventory SIMPK</h3>
                 </div>

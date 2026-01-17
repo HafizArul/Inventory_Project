@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 if (!isset($_SESSION['login'])) {
     header("Location: login.php");
     exit;
@@ -8,42 +7,53 @@ if (!isset($_SESSION['login'])) {
 
 $conn = new mysqli("localhost", "root", "", "proyek_inventory");
 if ($conn->connect_error) {
-    die("Koneksi gagal: " . $conn->connect_error);
+    die("Koneksi gagal");
 }
 
 /* ================= DATA TABEL ================= */
 $dataKeluar = mysqli_query($conn, "
-    SELECT bk.id_keluar, b.nama_barang, p.nama_proyek, bk.jumlah, bk.tanggal
+    SELECT bk.id_keluar, bk.id_barang, bk.id_proyek, bk.id_tahap,
+           b.nama_barang, p.nama_proyek, bk.jumlah, bk.tanggal
     FROM barang_keluar bk
     JOIN barang b ON bk.id_barang = b.id_barang
     JOIN proyek p ON bk.id_proyek = p.id_proyek
     ORDER BY bk.tanggal DESC
 ");
 
-/* ================= DROPDOWN ================= */
-$barang = mysqli_query($conn, "SELECT id_barang, nama_barang FROM barang");
-$proyek = mysqli_query($conn, "SELECT id_proyek, nama_proyek FROM proyek");
-$tahap  = mysqli_query($conn, "SELECT id_tahap, nama_tahap FROM tahap_proyek");
+/* ================= DROPDOWN DATA ================= */
+$barangList = mysqli_query($conn, "SELECT id_barang, nama_barang FROM barang");
+$proyekList = mysqli_query($conn, "SELECT id_proyek, nama_proyek FROM proyek");
+$tahapList  = mysqli_query($conn, "SELECT id_tahap, nama_tahap FROM tahap_proyek");
 
-// Cek apakah form telah disubmit
-if (isset($_POST['submit'])) {
-    $id_barang = $_POST['id_barang'];
-    $id_proyek = $_POST['id_proyek'];
-    $id_tahap  = $_POST['id_tahap'];
-    $jumlah    = $_POST['jumlah'];
-    $tanggal   = $_POST['tanggal'];
+/* ================= TAMBAH ================= */
+if (isset($_POST['tambah'])) {
+    mysqli_query($conn, "
+        INSERT INTO barang_keluar (id_barang, id_proyek, id_tahap, jumlah, tanggal)
+        VALUES (
+            '$_POST[id_barang]',
+            '$_POST[id_proyek]',
+            '$_POST[id_tahap]',
+            '$_POST[jumlah]',
+            '$_POST[tanggal]'
+        )
+    ");
+    header("Location: keluar.php");
+    exit;
+}
 
-    // Insert data ke database
-    $insertSql = "INSERT INTO barang_keluar (id_barang, id_proyek, id_tahap, jumlah, tanggal) 
-                  VALUES ('$id_barang', '$id_proyek', '$id_tahap', '$jumlah', '$tanggal')";
-
-    if (mysqli_query($conn, $insertSql)) {
-        // Redirect atau tampilkan pesan sukses
-        header("Location: keluar.php");
-        exit;
-    } else {
-        echo "Error: " . $insertSql . "<br>" . $conn->error;
-    }
+/* ================= EDIT ================= */
+if (isset($_POST['update'])) {
+    mysqli_query($conn, "
+        UPDATE barang_keluar SET
+            id_barang='$_POST[id_barang]',
+            id_proyek='$_POST[id_proyek]',
+            id_tahap='$_POST[id_tahap]',
+            jumlah='$_POST[jumlah]',
+            tanggal='$_POST[tanggal]'
+        WHERE id_keluar='$_POST[id_keluar]'
+    ");
+    header("Location: keluar.php");
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -54,10 +64,9 @@ if (isset($_POST['submit'])) {
     <title>Barang Keluar</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 
 <body class="sb-nav-fixed">
@@ -65,30 +74,28 @@ if (isset($_POST['submit'])) {
     <?php include 'navbar.php'; ?>
 
     <div id="layoutSidenav">
-        <div id="layoutSidenav_nav">
-            <?php include 'sidebar.php'; ?>
-        </div>
+        <div id="layoutSidenav_nav"><?php include 'sidebar.php'; ?></div>
 
         <div id="layoutSidenav_content">
             <main class="container-fluid px-4">
 
                 <h1 class="mt-4">Barang Keluar</h1>
                 <ol class="breadcrumb mb-4">
-                    <li class="breadcrumb-item active">Dashboard / Barang Masuk</li>
+                    <li class="breadcrumb-item active">Dashboard / Barang Keluar</li>
                 </ol>
-                <button class="btn btn-primary mb-3"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalKeluar">
-                    <i class="fas fa-plus"></i> Tambah Barang Keluar
+
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalTambah">
+                    <i class="bi bi-plus-circle"></i> Tambah Barang Keluar
                 </button>
+
                 <div class="card mb-4">
                     <div class="card-header">
-                        <i class="fas fa-boxes me-1"></i>
+                       <i class="bi bi-box-seam"></i>
                         Data Barang Keluar
                     </div>
                     <div class="card-body">
 
-                        <table id="datatablesSimple" class="table table-bordered table-striped">
+                        <table id="datatablesSimple" class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -100,98 +107,151 @@ if (isset($_POST['submit'])) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php
-                                while ($row = mysqli_fetch_assoc($dataKeluar)) { ?>
+                                <?php while ($row = mysqli_fetch_assoc($dataKeluar)) { ?>
                                     <tr>
                                         <td><?= $row['id_keluar'] ?></td>
                                         <td><?= $row['nama_barang'] ?></td>
                                         <td><?= $row['nama_proyek'] ?></td>
                                         <td><?= $row['jumlah'] ?></td>
                                         <td><?= $row['tanggal'] ?></td>
-                                        <td>
-                                            <button class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i></button>
-                                            <button class='btn btn-sm btn-danger'><i class='bi bi-trash'></i></button>
+                                        <td class="text-center">
+                                            <button class="btn btn-warning btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalEdit"
+                                                data-id="<?= $row['id_keluar'] ?>"
+                                                data-barang="<?= $row['id_barang'] ?>"
+                                                data-proyek="<?= $row['id_proyek'] ?>"
+                                                data-tahap="<?= $row['id_tahap'] ?>"
+                                                data-jumlah="<?= $row['jumlah'] ?>"
+                                                data-tanggal="<?= $row['tanggal'] ?>">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+
+                                            <a href="keluar_hapus.php?id=<?= $row['id_keluar'] ?>"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Yakin hapus data?')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                 <?php } ?>
                             </tbody>
                         </table>
+
                     </div>
                 </div>
             </main>
         </div>
     </div>
 
-    <!-- ================= MODAL ================= -->
-    <div class="modal fade" id="modalKeluar" tabindex="-1">
+    <!-- ================= MODAL TAMBAH ================= -->
+    <div class="modal fade" id="modalTambah">
         <div class="modal-dialog">
             <div class="modal-content">
+                <form method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Tambah Barang Keluar</h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
 
-                <div class="modal-header">
-                    <h5 class="modal-title">Input Barang Keluar</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+                    <div class="modal-body">
+                        <select name="id_barang" class="form-select mb-2" required>
+                            <option value="">Pilih Barang</option>
+                            <?php mysqli_data_seek($barangList, 0);
+                            while ($b = mysqli_fetch_assoc($barangList)) { ?>
+                                <option value="<?= $b['id_barang'] ?>"><?= $b['nama_barang'] ?></option>
+                            <?php } ?>
+                        </select>
 
-                <div class="modal-body">
-                    <form method="post" action="">
+                        <select name="id_proyek" class="form-select mb-2" required>
+                            <option value="">Pilih Proyek</option>
+                            <?php mysqli_data_seek($proyekList, 0);
+                            while ($p = mysqli_fetch_assoc($proyekList)) { ?>
+                                <option value="<?= $p['id_proyek'] ?>"><?= $p['nama_proyek'] ?></option>
+                            <?php } ?>
+                        </select>
 
-                        <div class="mb-3">
-                            <label class="form-label">Barang</label>
-                            <select name="id_barang" class="form-select" required>
-                                <option value="">Pilih Barang</option>
-                                <?php while ($b = mysqli_fetch_assoc($barang)) { ?>
-                                    <option value="<?= $b['id_barang'] ?>"><?= $b['nama_barang'] ?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
+                        <select name="id_tahap" class="form-select mb-2" required>
+                            <option value="">Pilih Tahap</option>
+                            <?php mysqli_data_seek($tahapList, 0);
+                            while ($t = mysqli_fetch_assoc($tahapList)) { ?>
+                                <option value="<?= $t['id_tahap'] ?>"><?= $t['nama_tahap'] ?></option>
+                            <?php } ?>
+                        </select>
 
-                        <div class="mb-3">
-                            <label class="form-label">Proyek</label>
-                            <select name="id_proyek" class="form-select" required>
-                                <option value="">Pilih Proyek</option>
-                                <?php while ($p = mysqli_fetch_assoc($proyek)) { ?>
-                                    <option value="<?= $p['id_proyek'] ?>"><?= $p['nama_proyek'] ?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
+                        <input type="number" name="jumlah" class="form-control mb-2" required>
+                        <input type="date" name="tanggal" class="form-control" required>
+                    </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Tahap Proyek</label>
-                            <select name="id_tahap" class="form-select" required>
-                                <option value="">Pilih Tahap</option>
-                                <?php while ($t = mysqli_fetch_assoc($tahap)) { ?>
-                                    <option value="<?= $t['id_tahap'] ?>"><?= $t['nama_tahap'] ?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Jumlah</label>
-                            <input type="number" name="jumlah" class="form-control" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Tanggal</label>
-                            <input type="date" name="tanggal" class="form-control" required>
-                        </div>
-
-                        <button type="submit" name="submit" class="btn btn-primary w-100">
-                            Simpan
-                        </button>
-
-                    </form>
-                </div>
-
+                    <div class="modal-footer">
+                        <button name="tambah" class="btn btn-primary w-100">Simpan</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- ================= SCRIPT ================= -->
+    <!-- ================= MODAL EDIT ================= -->
+    <div class="modal fade" id="modalEdit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post">
+                    <input type="hidden" name="id_keluar" id="edit_id">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Barang Keluar</h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <select name="id_barang" id="edit_barang" class="form-select mb-2" required>
+                            <?php mysqli_data_seek($barangList, 0);
+                            while ($b = mysqli_fetch_assoc($barangList)) { ?>
+                                <option value="<?= $b['id_barang'] ?>"><?= $b['nama_barang'] ?></option>
+                            <?php } ?>
+                        </select>
+
+                        <select name="id_proyek" id="edit_proyek" class="form-select mb-2" required>
+                            <?php mysqli_data_seek($proyekList, 0);
+                            while ($p = mysqli_fetch_assoc($proyekList)) { ?>
+                                <option value="<?= $p['id_proyek'] ?>"><?= $p['nama_proyek'] ?></option>
+                            <?php } ?>
+                        </select>
+
+                        <select name="id_tahap" id="edit_tahap" class="form-select mb-2" required>
+                            <?php mysqli_data_seek($tahapList, 0);
+                            while ($t = mysqli_fetch_assoc($tahapList)) { ?>
+                                <option value="<?= $t['id_tahap'] ?>"><?= $t['nama_tahap'] ?></option>
+                            <?php } ?>
+                        </select>
+
+                        <input type="number" name="jumlah" id="edit_jumlah" class="form-control mb-2" required>
+                        <input type="date" name="tanggal" id="edit_tanggal" class="form-control" required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button name="update" class="btn btn-warning w-100">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/scripts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"></script>
+    <script src="js/scripts.js"></script>
     <script>
-        const dataTable = new simpleDatatables.DataTable("#datatablesSimple");
+        new simpleDatatables.DataTable("#datatablesSimple");
+
+        document.getElementById('modalEdit').addEventListener('show.bs.modal', function(e) {
+            let b = e.relatedTarget;
+            edit_id.value = b.dataset.id;
+            edit_barang.value = b.dataset.barang;
+            edit_proyek.value = b.dataset.proyek;
+            edit_tahap.value = b.dataset.tahap;
+            edit_jumlah.value = b.dataset.jumlah;
+            edit_tanggal.value = b.dataset.tanggal;
+        });
     </script>
 
 </body>

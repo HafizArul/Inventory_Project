@@ -46,11 +46,33 @@ if (isset($_POST['submit'])) {
     }
 }
 
+// ================== UPDATE ==================
+if (isset($_POST['update'])) {
+    mysqli_query($conn, "
+        UPDATE barang SET
+            nama_barang = '$_POST[nama_barang]',
+            stok        = '$_POST[stok]',
+            satuan      = '$_POST[satuan]',
+            harga       = '$_POST[harga]'
+        WHERE id_barang = '$_POST[id_barang]'
+    ");
+    header("Location: barang.php");
+    exit;
+}
+
+// ================== SELECT ==================
+$result = $conn->query("
+    SELECT id_barang, nama_barang, stok, satuan, kategori, harga
+    FROM barang
+    ORDER BY nama_barang ASC
+");
+
 ?>
 
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -60,6 +82,7 @@ if (isset($_POST['submit'])) {
     <link href="css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
+
 <body class="sb-nav-fixed">
     <!-- Navbar -->
     <?php require 'navbar.php'; ?> <!-- opsional -->
@@ -110,19 +133,35 @@ if (isset($_POST['submit'])) {
                                 <tbody>
                                     <?php
                                     if ($result->num_rows > 0) {
-                                        while($row = $result->fetch_assoc()) {
-                                            echo "<tr>
-                                                    <td>{$row['id_barang']}</td>
-                                                    <td>{$row['nama_barang']}</td>
-                                                    <td>{$row['stok']}</td>
-                                                    <td>{$row['satuan']}</td>
-                                                    <td>{$row['kategori']}</td>
-                                                    <td>
-                                                        <button class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i></button>
-                                                        <button class='btn btn-sm btn-danger'><i class='bi bi-trash'></i></button>
-                                                    </td>
-                                                  </tr>";
-                                        }
+                                        while ($row = $result->fetch_assoc()) { ?>
+                                            <tr>
+                                                <td><?= $row['id_barang'] ?></td>
+                                                <td><?= $row['nama_barang'] ?></td>
+                                                <td><?= $row['stok'] ?></td>
+                                                <td><?= $row['satuan'] ?></td>
+                                                <td><?= $row['kategori'] ?></td>
+                                                <td>
+
+                                                    <button class="btn btn-warning btn-sm"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalEdit"
+                                                        data-id="<?= $row['id_barang'] ?>"
+                                                        data-nama="<?= $row['nama_barang'] ?>"
+                                                        data-stok="<?= $row['stok'] ?>"
+                                                        data-satuan="<?= $row['satuan'] ?>"
+                                                        data-harga="<?= $row['harga'] ?>">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </button>
+                                                    
+
+                                                    <a href="barang_hapus.php?id=<?= $row['id_barang'] ?>"
+                                                        class="btn btn-danger btn-sm"
+                                                        onclick="return confirm('Yakin hapus data?')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                    <?php }
                                     } else {
                                         echo "<tr><td colspan='4' class='text-center'>Tidak ada data</td></tr>";
                                     }
@@ -150,58 +189,105 @@ if (isset($_POST['submit'])) {
 
     <!-- Form Modal -->
     <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">Input Data Barang</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <form action="" method="post">
-                <div class="mb-3">
-                    <label for="namaBarang" class="form-label">Input Nama Barang</label>
-                    <input type="text" class="form-control" id="namaBarang" name="nama_barang" required>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Input Data Barang</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="mb-3">
-                    <label for="stok" class="form-label">Stok</label>
-                    <input type="number" class="form-control" id="stok" name="stok" required>
+                <div class="modal-body">
+                    <form action="" method="post">
+                        <div class="mb-3">
+                            <label for="namaBarang" class="form-label">Input Nama Barang</label>
+                            <input type="text" class="form-control" id="namaBarang" name="nama_barang" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="stok" class="form-label">Stok</label>
+                            <input type="number" class="form-control" id="stok" name="stok" required>
+                        </div>
+                        <div class="mb-3">
+                            <div class="col-md-12">
+                                <label for="satuan" class="form-label">Satuan</label>
+                                <select id="satuan" class="form-select" name="satuan" required>
+                                    <option selected>Pilih Satuan...</option>
+                                    <option value="Sak">Sak</option>
+                                    <option value="Batang">Batang</option>
+                                    <option value="M3">M3</option>
+                                    <option value="Kaleng">Kaleng</option>
+                                    <option value="Kg">Kg</option>
+                                    <option value="Unit">Unit</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="col-md-12">
+                                <label for="kategori" class="form-label">Kategori</label>
+                                <select id="kategori" class="form-select" name="kategori" required>
+                                    <option selected>Pilih Kategori...</option>
+                                    <option value="Material">Material</option>
+                                    <option value="Alat">Alat</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="harga" class="form-label">Harga</label>
+                            <input type="number" class="form-control" id="harga" name="harga" required>
+                        </div>
+                        <div class="mb-3 d-grid mx-auto">
+                            <button type="submit" class="btn btn-primary" name="submit">Submit</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    <div class="col-md-12">
-                        <label for="satuan" class="form-label">Satuan</label>
-                        <select id="satuan" class="form-select" name="satuan" required>
-                            <option selected>Pilih Satuan...</option>
-                            <option value="Sak">Sak</option>
-                            <option value="Batang">Batang</option>
-                            <option value="M3">M3</option>
-                            <option value="Kaleng">Kaleng</option>
-                            <option value="Kg">Kg</option>
-                            <option value="Unit">Unit</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <div class="col-md-12">
-                        <label for="kategori" class="form-label">Kategori</label>
-                        <select id="kategori" class="form-select" name="kategori" required>
-                            <option selected>Pilih Kategori...</option>
-                            <option value="Material">Material</option>
-                            <option value="Alat">Alat</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label for="harga" class="form-label">Harga</label>
-                    <input type="number" class="form-control" id="harga" name="harga" required>
-                </div>
-                <div class="mb-3 d-grid mx-auto">
-                    <button type="submit" class="btn btn-primary" name="submit">Submit</button>
-                </div>
-            </form>
-        </div>
+            </div>
         </div>
     </div>
+
+    <!-- ================= MODAL EDIT ================= -->
+    <div class="modal fade" id="modalEdit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post">
+                    <input type="hidden" name="id_barang" id="edit_id">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Barang</h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label for="nama_barang" class="form-label">Nama Barang</label>
+                            <input class="form-control mb-2" name="nama_barang" id="edit_nama" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="stok" class="form-label">Stok Barang</label>
+                            <input class="form-control mb-2" name="stok" id="edit_stok" type="number" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="satuan" class="form-label">Satuan Barang</label>
+                            <select class="form-select mb-2" name="satuan" id="edit_satuan" required>
+                                <option>Sak</option>
+                                <option>Batang</option>
+                                <option>Kg</option>
+                                <option>Unit</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="harga" class="form-label">Harga Barang</label>
+                            <input class="form-control mb-2" name="harga" id="edit_harga" type="number" required>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-warning w-100" name="update">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
@@ -209,5 +295,18 @@ if (isset($_POST['submit'])) {
     <script>
         const dataTable = new simpleDatatables.DataTable("#datatablesSimple");
     </script>
+    <script>
+    document.getElementById('modalEdit').addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+
+    document.getElementById('edit_id').value     = button.getAttribute('data-id');
+    document.getElementById('edit_nama').value   = button.getAttribute('data-nama');
+    document.getElementById('edit_stok').value   = button.getAttribute('data-stok');
+    document.getElementById('edit_satuan').value = button.getAttribute('data-satuan');
+    document.getElementById('edit_harga').value  = button.getAttribute('data-harga');
+});
+</script>
+
 </body>
+
 </html>

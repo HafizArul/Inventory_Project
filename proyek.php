@@ -48,6 +48,30 @@ if (isset($_POST['submit'])) {
     }
 }
 
+/* ================= UPDATE ================= */
+if (isset($_POST['update'])) {
+    mysqli_query($conn, "
+        UPDATE proyek SET
+            nama_proyek    = '$_POST[nama_proyek]',
+            jenis_proyek   = '$_POST[jenis_proyek]',
+            lokasi         = '$_POST[lokasi]',
+            status         = '$_POST[status]',
+            tanggal_mulai  = '$_POST[tanggal_mulai]',
+            tanggal_selesai= '$_POST[tanggal_selesai]'
+        WHERE id_proyek = '$_POST[id_proyek]'
+    ");
+
+    header("Location: proyek.php");
+    exit;
+}
+
+/* ================= SELECT ================= */
+$result = $conn->query("
+    SELECT id_proyek, nama_proyek, jenis_proyek, lokasi, status, tanggal_mulai, tanggal_selesai
+    FROM proyek
+    ORDER BY tanggal_mulai DESC
+");
+
 ?>
 
 <!DOCTYPE html>
@@ -90,7 +114,7 @@ if (isset($_POST['submit'])) {
                             Data Proyek
                         </div>
                         <div class="card-body">
-                            <table id="datatablesSimple">
+                            <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>ID Proyek</th>
@@ -101,32 +125,41 @@ if (isset($_POST['submit'])) {
                                         <th>Opsi</th>
                                     </tr>
                                 </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>ID Proyek</th>
-                                        <th>Nama Proyek</th>
-                                        <th>Lokasi</th>
-                                        <th>Tanggal Mulai</th>
-                                        <th>Tanggal Selesai</th>
-                                        <th>Opsi</th>
-                                    </tr>
-                                </tfoot>
+
                                 <tbody>
                                     <?php
                                     if ($result->num_rows > 0) {
-                                        while ($row = $result->fetch_assoc()) {
-                                            echo "<tr>
-                                                    <td>{$row['id_proyek']}</td>
-                                                    <td>{$row['nama_proyek']}</td>
-                                                    <td>{$row['lokasi']}</td>
-                                                    <td>{$row['tanggal_mulai']}</td>
-                                                    <td>{$row['tanggal_selesai']}</td>
-                                                    <td>
-                                                        <button class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i></button>
-                                                        <button class='btn btn-sm btn-danger'><i class='bi bi-trash'></i></button>
-                                                    </td>
-                                                  </tr>";
-                                        }
+                                        while ($row = $result->fetch_assoc()) { ?>
+                                            <tr>
+                                                <td><?= $row['id_proyek'] ?></td>
+                                                <td><?= $row['nama_proyek'] ?></td>
+                                                <td><?= $row['lokasi'] ?></td>
+                                                <td><?= $row['tanggal_mulai'] ?></td>
+                                                <td><?= $row['tanggal_selesai'] ?></td>
+                            
+                                                <td class="text-center">
+                                                    <button class="btn btn-warning btn-sm"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalEdit"
+                                                        data-id="<?= $row['id_proyek'] ?>"
+                                                        data-nama="<?= $row['nama_proyek'] ?>"
+                                                        data-jenis="<?= $row['jenis_proyek'] ?>"
+                                                        data-lokasi="<?= $row['lokasi'] ?>"
+                                                        data-status="<?= $row['status'] ?>"
+                                                        data-mulai="<?= $row['tanggal_mulai'] ?>"
+                                                        data-selesai="<?= $row['tanggal_selesai'] ?>">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </button>
+
+                                                    <a href="proyek_hapus.php?id=<?= $row['id_proyek']; ?>"
+                                                        class="btn btn-sm btn-danger"
+                                                        onclick="return confirm('Yakin hapus proyek ini?')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </td>
+
+                                            </tr>
+                                    <?php }
                                     } else {
                                         echo "<tr><td colspan='5' class='text-center'>Tidak ada data</td></tr>";
                                     }
@@ -212,12 +245,99 @@ if (isset($_POST['submit'])) {
         </div>
     </div>
 
+    <!-- ================= MODAL EDIT PROYEK ================= -->
+    <div class="modal fade" id="modalEdit" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form method="post">
+                    <input type="hidden" name="id_proyek" id="edit_id">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-pencil-square"></i> Edit Proyek
+                        </h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label class="form-label">Nama Proyek</label>
+                            <input type="text" class="form-control" id="edit_nama" name="nama_proyek" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Jenis Proyek</label>
+                            <select class="form-select" id="edit_jenis" name="jenis_proyek" required>
+                                <option value="Perumahan">Perumahan</option>
+                                <option value="Gedung">Gedung</option>
+                                <option value="Jalan">Jalan</option>
+                                <option value="Renovasi">Renovasi</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Lokasi</label>
+                            <input type="text" class="form-control" id="edit_lokasi" name="lokasi" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="edit_status" name="status" required>
+                                <option value="Perencanaan">Perencanaan</option>
+                                <option value="Berjalan">Berjalan</option>
+                                <option value="Selesai">Selesai</option>
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Tanggal Mulai</label>
+                                <input type="date" class="form-control" id="edit_mulai" name="tanggal_mulai" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tanggal Selesai</label>
+                                <input type="date" class="form-control" id="edit_selesai" name="tanggal_selesai" required>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" name="update" class="btn btn-success w-100">
+                            <i class="bi bi-save"></i> Update
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
     <script>
         const dataTable = new simpleDatatables.DataTable("#datatablesSimple");
     </script>
+
+    <script>
+        const modalEdit = document.getElementById('modalEdit');
+
+        modalEdit.addEventListener('show.bs.modal', function(event) {
+            const btn = event.relatedTarget;
+
+            document.getElementById('edit_id').value = btn.getAttribute('data-id');
+            document.getElementById('edit_nama').value = btn.getAttribute('data-nama');
+            document.getElementById('edit_jenis').value = btn.getAttribute('data-jenis');
+            document.getElementById('edit_lokasi').value = btn.getAttribute('data-lokasi');
+            document.getElementById('edit_status').value = btn.getAttribute('data-status');
+            document.getElementById('edit_mulai').value = btn.getAttribute('data-mulai');
+            document.getElementById('edit_selesai').value = btn.getAttribute('data-selesai');
+        });
+    </script>
+
 </body>
 
 </html>

@@ -42,6 +42,30 @@ if (isset($_POST['submit'])) {
     }
 }
 
+// ================== UPDATE SUPPLIER ==================
+if (isset($_POST['update'])) {
+    $id      = $_POST['id_supplier'];
+    $nama    = $_POST['nama_supplier'];
+    $kontak  = $_POST['kontak'];
+    $alamat  = $_POST['alamat'];
+
+    $update = mysqli_query($conn, "
+        UPDATE supplier SET
+            nama_supplier='$nama',
+            kontak='$kontak',
+            alamat='$alamat'
+        WHERE id_supplier='$id'
+    ");
+
+    if ($update) {
+        header("Location: supplier.php");
+        exit;
+    } else {
+        echo "Gagal update data";
+    }
+}
+
+
 ?>
 
 <!DOCTYPE html>
@@ -82,7 +106,7 @@ if (isset($_POST['submit'])) {
                             Data Supplier
                         </div>
                         <div class="card-body">
-                            <table id="datatablesSimple">
+                            <table id="datatablesSimple" class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th>ID Supplier</th>
@@ -92,30 +116,38 @@ if (isset($_POST['submit'])) {
                                         <th>Opsi</th>
                                     </tr>
                                 </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>ID Supplier</th>
-                                        <th>Nama Supplier</th>
-                                        <th>Kontak</th>
-                                        <th>Alamat</th>
-                                        <th>Opsi</th>
-                                    </tr>
-                                </tfoot>
+                               
                                 <tbody>
                                     <?php
                                     if ($result->num_rows > 0) {
-                                        while($row = $result->fetch_assoc()) {
-                                            echo "<tr>
-                                                    <td>{$row['id_supplier']}</td>
-                                                    <td>{$row['nama_supplier']}</td>
-                                                    <td>{$row['kontak']}</td>
-                                                    <td>{$row['alamat']}</td>
+                                        while ($row = $result->fetch_assoc()) { ?>
+                                            <tr>
+                                                    <td><?= $row['id_supplier'] ?></td>
+                                                    <td><?= $row['nama_supplier']?></td>
+                                                    <td><?= $row['kontak']?></td>
+                                                    <td><?= $row['alamat']?></td>
                                                     <td>
-                                                        <button class='btn btn-sm btn-warning'><i class='bi bi-pencil-square'></i></button>
-                                                        <button class='btn btn-sm btn-danger'><i class='bi bi-trash'></i></button>
-                                                    </td>
-                                                  </tr>";
-                                        }
+                
+                                                     <button class="btn btn-sm btn-warning"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalEdit"
+                                                        data-id="<?= $row['id_supplier']; ?>"
+                                                        data-nama="<?= $row['nama_supplier']; ?>"
+                                                        data-kontak="<?= $row['kontak']; ?>"
+                                                        data-alamat="<?= $row['alamat']; ?>">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </button>
+
+                                                    <a href="supplier_hapus.php?id=<?= $row['id_supplier'] ?>"
+                                                    class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Yakin hapus supplier ini?')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </td>
+
+                                                    
+                                                  </tr>
+                                        <?php }
                                     } else {
                                         echo "<tr><td colspan='4' class='text-center'>Tidak ada data</td></tr>";
                                     }
@@ -174,11 +206,73 @@ if (isset($_POST['submit'])) {
     </div>
     </div>
 
+    <!-- ================= MODAL EDIT SUPPLIER ================= -->
+<div class="modal fade" id="modalEdit" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form method="post">
+                <input type="hidden" name="id_supplier" id="edit_id">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil-square"></i> Edit Supplier
+                    </h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">Nama Supplier</label>
+                        <input type="text" name="nama_supplier" id="edit_nama"
+                               class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Kontak</label>
+                        <input type="text" name="kontak" id="edit_kontak"
+                               class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Alamat</label>
+                        <textarea name="alamat" id="edit_alamat"
+                                  class="form-control" rows="3" required></textarea>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" name="update" class="btn btn-success w-100">
+                        <i class="bi bi-save"></i> Update
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
     <script>
         const dataTable = new simpleDatatables.DataTable("#datatablesSimple");
     </script>
+    <script>
+const modalEdit = document.getElementById('modalEdit');
+
+modalEdit.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+
+    document.getElementById('edit_id').value     = button.getAttribute('data-id');
+    document.getElementById('edit_nama').value   = button.getAttribute('data-nama');
+    document.getElementById('edit_kontak').value = button.getAttribute('data-kontak');
+    document.getElementById('edit_alamat').value = button.getAttribute('data-alamat');
+});
+</script>
+
 </body>
 </html>

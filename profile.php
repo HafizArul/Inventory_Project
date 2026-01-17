@@ -2,6 +2,7 @@
 session_start();
 require_once __DIR__ . '/config/koneksi.php';
 
+/* ================= CEK LOGIN ================= */
 if (!isset($_SESSION['login'])) {
     header("Location: login.php");
     exit;
@@ -13,6 +14,25 @@ if (!isset($_SESSION['id_user'])) {
 
 $id_user = (int) $_SESSION['id_user'];
 
+/* ================= UPDATE PROFIL ================= */
+if (isset($_POST['update'])) {
+    $nama = mysqli_real_escape_string($conn, $_POST['nama']);
+
+    $update = mysqli_query($conn, "
+        UPDATE users 
+        SET nama = '$nama'
+        WHERE id_user = $id_user
+    ");
+
+    if ($update) {
+        header("Location: profile.php?success=1");
+        exit;
+    } else {
+        die("Gagal update profile");
+    }
+}
+
+/* ================= AMBIL DATA USER ================= */
 $query = mysqli_query($conn, "SELECT * FROM users WHERE id_user = $id_user");
 
 if (!$query || mysqli_num_rows($query) === 0) {
@@ -27,6 +47,7 @@ $user = mysqli_fetch_assoc($query);
 <head>
 <meta charset="utf-8">
 <title>Profil User</title>
+
 <link href="css/styles.css" rel="stylesheet">
 <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"></script>
 </head>
@@ -34,12 +55,7 @@ $user = mysqli_fetch_assoc($query);
 <body class="sb-nav-fixed">
 
 <!-- TOP NAV -->
-<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-    <a class="navbar-brand ps-3" href="dashboard.php">INVENTORY PROYEK</a>
-    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4" id="sidebarToggle">
-        <i class="fas fa-bars"></i>
-    </button>
-</nav>
+<?php include 'navbar.php'; ?>
 
 <div id="layoutSidenav">
 
@@ -52,6 +68,12 @@ $user = mysqli_fetch_assoc($query);
 
 <h1 class="mt-4">Profil Saya</h1>
 
+<?php if (isset($_GET['success'])): ?>
+    <div class="alert alert-success">
+        Profile berhasil diperbarui
+    </div>
+<?php endif; ?>
+
 <div class="card col-md-6">
 <div class="card-body">
 
@@ -61,7 +83,7 @@ $user = mysqli_fetch_assoc($query);
         <input type="text"
                name="nama"
                class="form-control"
-               value="<?= htmlspecialchars($user['nama'] ?? '') ?>"
+               value="<?= htmlspecialchars($user['nama']) ?>"
                required>
     </div>
 
@@ -69,7 +91,7 @@ $user = mysqli_fetch_assoc($query);
         <label class="form-label">Username</label>
         <input type="text"
                class="form-control"
-               value="<?= htmlspecialchars($user['username'] ?? '') ?>"
+               value="<?= htmlspecialchars($user['username']) ?>"
                readonly>
     </div>
 
@@ -77,7 +99,7 @@ $user = mysqli_fetch_assoc($query);
         <label class="form-label">Role</label>
         <input type="text"
                class="form-control"
-               value="<?= htmlspecialchars($user['role'] ?? '') ?>"
+               value="<?= htmlspecialchars($user['role']) ?>"
                readonly>
     </div>
 
@@ -88,7 +110,6 @@ $user = mysqli_fetch_assoc($query);
 
 </div>
 </div>
-
 
 </main>
 
