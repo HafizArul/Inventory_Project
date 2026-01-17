@@ -47,7 +47,7 @@ if (isset($_POST['login'])) {
 <div class="container">
     <div class="row justify-content-center align-items-center vh-100">
         <div class="col-lg-5">
-            <div class="card shadow-lg mt-5" style="border-radius: 15px;  overflow: hidden; background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);">
+            <div class="card shadow-lg mt-5" style="border-radius: 15px; overflow: hidden; background-color: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);">
                 <div class="card-header text-center" style="background-color: #e7b45c; color: #ffffff; font-weight: bold;">
                     <h3>Inventory SIMPK</h3>
                 </div>
@@ -61,7 +61,7 @@ if (isset($_POST['login'])) {
                             <label>Username</label>
                         </div>
 
-                        <div class="form-floating mb-3">
+                        <div class="form-floating mb-5">
                             <input type="password" class="form-control" name="password" required>
                             <label>Password</label>
                         </div>
