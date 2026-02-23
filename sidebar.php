@@ -54,6 +54,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 <div class="collapse" id="collapseAuth" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="profile.php">Profil</a>
+                        <a class="nav-link" href="register.php">Register</a>
                         <a class="nav-link" href="password.php">Ganti Password</a>
                         <a class="nav-link text-danger" href="logout.php">Logout</a>
                     </nav>

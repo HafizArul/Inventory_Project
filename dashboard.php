@@ -130,7 +130,9 @@ $log = mysqli_query($conn, "
                                                 <div
                                                     class="progress-bar bg-success"
                                                     role="progressbar"
-                                                    style="width: <?= $p['persen'] > 100 ? '0%' : $p['persen'] . '%'  ?>">
+                                                    
+                                                    style="width: <?= $p['persen'] > 100 ? '100%' : $p['persen'].'%' ?>">
+
                                                     <?= $p['persen'] ?>%
                                                 </div>
                                             </div>
